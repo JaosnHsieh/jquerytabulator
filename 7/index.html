@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js" integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=" crossorigin="anonymous"></script>
+
+  <link href="../css/tabulator.css" rel="stylesheet">
+  <script type="text/javascript" src="../js/tabulator.js"></script>
+
+</head>
+<body>
+  <h2>可編輯 按下SAVE後 用Ajax POST方法傳到後端 儲存到MYSQL </h2>
+  <div>
+    <button id="showData" style="width:200px;height:200px;font-size:20px;">Save to db</button>
+    <button id="addNewRow" style="width:200px;height:200px;font-size:20px;">新增一行</button>
+  </div>
+  <h2><a href="http://olifolkerd.github.io/tabulator/docs/#manipulating-data">詳細文在這</a></h2>
+  <div id="example-table"></div>
+
+
+
+
+
+
+
+  <script>
+  $("#addNewRow").click(function(e){
+    $("#example-table").tabulator("addRow", {
+    });
+
+  });
+
+
+
+  $("#showData").click(function(e){
+    e.preventDefault();
+
+    var data = $("#example-table").tabulator("getData"); // 取得目前Table的資料(有可能編輯過後)
+
+    $.ajax({
+            url: 'http://localhost:3000/api/test2',
+            type: 'POST',
+            data: {data:JSON.stringify(data)},
+            contentType: 'application/x-www-form-urlencoded',
+            dataType: 'json',
+            // async: false,
+            success: function(msg) {
+
+                }
+          });
+  });
+
+  //create Tabulator on DOM element with id "example-table"
+  $("#example-table").tabulator({
+  //height:"320px", // set height of table (optional)
+  fitColumns:true, //fit columns to width of table (optional)
+  pagination:true,
+  paginationSize:20,
+  columns:[ //Define Table COlumns
+      // {title:"Id", field:"id", sorter:"string",width:150},
+      {title:"來文", field:"fromtext", sorter:"number", align:"left",editable:true,editor:"input"},
+      {title:"來文號", field:"fromnumber", sorter:"string", sortable:false,editable:true,editor:"input"},
+      {title:"受文", field:"totext", sorter:"date", align:"center",editable:true,editor:"input"},
+      {title:"受文號", field:"tonumber", sorter:"date", align:"center",editable:true,editor:"input"},
+      {title:"摘要", field:"summary", sorter:"date", align:"center",editable:true,editor:"input"},
+      {title:"建立時間", field:"createdAt", sorter:"date", align:"center"},
+      {title:"更新時間", field:"updatedAt", sorter:"date", align:"center"}
+  ],
+  // rowClick:function(e, id, data, row){ //trigger an alert message when the row is clicked
+  //     alert("Row " + id + " Clicked!!!!");
+  // },
+  });
+
+    $("#example-table").tabulator("setData", "http://localhost:3000/api/test");
+
+
+  </script>
+
+
+</body>
+</html>
