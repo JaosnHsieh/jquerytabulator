@@ -10,12 +10,13 @@
 
   <link href="../css/tabulator.css" rel="stylesheet">
   <script type="text/javascript" src="../js/tabulator.js"></script>
+  <script type="text/javascript" src="../js/spin.min.js"></script>
 
 </head>
 <body>
-  <h2>可編輯 按下SAVE後 用Ajax POST方法傳到後端 儲存到MYSQL </h2>
+  <h2 id="spin">可點刪除資料</h2>
   <div>
-    <button id="showData" style="width:200px;height:200px;font-size:20px;">Save to db</button>
+    <button id="saveData" style="width:200px;height:200px;font-size:20px;">Save to db</button>
     <button id="addNewRow" style="width:200px;height:200px;font-size:20px;">新增一行</button>
   </div>
   <h2><a href="http://olifolkerd.github.io/tabulator/docs/#manipulating-data">詳細文在這</a></h2>
@@ -28,6 +29,31 @@
 
 
   <script>
+  var opts = {
+    lines: 13 // The number of lines to draw
+  , length: 28 // The length of each line
+  , width: 14 // The line thickness
+  , radius: 42 // The radius of the inner circle
+  , scale: 1.5 // Scales overall size of the spinner
+  , corners: 1 // Corner roundness (0..1)
+  , color: '#000' // #rgb or #rrggbb or array of colors
+  , opacity: 0.25 // Opacity of the lines
+  , rotate: 0 // The rotation offset
+  , direction: 1 // 1: clockwise, -1: counterclockwise
+  , speed: 1 // Rounds per second
+  , trail: 60 // Afterglow percentage
+  , fps: 20 // Frames per second when using setTimeout() as a fallback for CSS
+  , zIndex: 2e9 // The z-index (defaults to 2000000000)
+  , className: 'spinner' // The CSS class to assign to the spinner
+  , top: '50%' // Top position relative to parent
+  , left: '50%' // Left position relative to parent
+  , shadow: false // Whether to render a shadow
+  , hwaccel: false // Whether to use hardware acceleration
+  , position: 'absolute' // Element positioning
+  }
+  var spinner = new Spinner(opts);
+  var target = document.getElementById('example-table')
+
   $("#addNewRow").click(function(e){
     $("#example-table").tabulator("addRow", {
     });
@@ -36,11 +62,12 @@
 
 
 
-  $("#showData").click(function(e){
+  $("#saveData").click(function(e){
+    spinner.spin(target);
     e.preventDefault();
 
     var data = $("#example-table").tabulator("getData"); // 取得目前Table的資料(有可能編輯過後)
-
+    console.table(data);
     $.ajax({
             url: 'http://localhost:3000/api/test2',
             type: 'POST',
@@ -49,6 +76,7 @@
             dataType: 'json',
             // async: false,
             success: function(msg) {
+              spinner.stop();
 
                 }
           });
@@ -59,16 +87,31 @@
   //height:"320px", // set height of table (optional)
   fitColumns:true, //fit columns to width of table (optional)
   pagination:true,
-  paginationSize:20,
+  paginationSize:5,
   columns:[ //Define Table COlumns
       // {title:"Id", field:"id", sorter:"string",width:150},
-      {title:"來文", field:"fromtext", sorter:"number", align:"left",editable:true,editor:"input"},
+      {title:"來文", field:"fromtext", sorter:"number", align:"left",editable:false,editor:"input"},
       {title:"來文號", field:"fromnumber", sorter:"string", sortable:false,editable:true,editor:"input"},
       {title:"受文", field:"totext", sorter:"date", align:"center",editable:true,editor:"input"},
       {title:"受文號", field:"tonumber", sorter:"date", align:"center",editable:true,editor:"input"},
       {title:"摘要", field:"summary", sorter:"date", align:"center",editable:true,editor:"input"},
       {title:"刪除",formatter:"tickCross",onClick:function(e, cell, val, data){
           $("#example-table").tabulator("deleteRow", data.id);
+          var data2 = $("#example-table").tabulator("getData");
+
+          spinner.spin(target);
+
+          $.ajax({
+                  url: 'http://localhost:3000/api/test2',
+                  type: 'DELETE',
+                  data: {data:JSON.stringify(data.id)},
+                  dataType: 'json',
+                  success: function(msg) {
+
+                      spinner.stop();
+
+                      }
+                });
       } },
   ],
       // rowClick:function(e, id, data, row){ //trigger an alert message when the row is clicked

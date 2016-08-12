@@ -13,7 +13,7 @@
 
 </head>
 <body>
-  <h2>可編輯 按下SAVE後 用Ajax POST方法傳到後端 儲存到MYSQL </h2>
+  <h2>可以新增一行(一筆資料) 再按儲存</h2>
   <div>
     <button id="showData" style="width:200px;height:200px;font-size:20px;">Save to db</button>
     <button id="addNewRow" style="width:200px;height:200px;font-size:20px;">新增一行</button>
@@ -70,9 +70,9 @@
       {title:"建立時間", field:"createdAt", sorter:"date", align:"center"},
       {title:"更新時間", field:"updatedAt", sorter:"date", align:"center"}
   ],
-  // rowClick:function(e, id, data, row){ //trigger an alert message when the row is clicked
-  //     alert("Row " + id + " Clicked!!!!");
-  // },
+  rowClick:function(e, id, data, row){ //trigger an alert message when the row is clicked
+      alert("Row " + id + " Clicked!!!!");
+  },
   });
 
     $("#example-table").tabulator("setData", "http://localhost:3000/api/test");
